@@ -9,19 +9,22 @@
     "start": "wrangler dev",
     "watch": "tsup --watch --dts",
     "build": "tsup --clean --dts",
-    "test": "node --env-file=.env e2e/basic.ts"
+    "test": "bun --env-file=.env test",
+    "test:prod": "export PROXY=https://proxy.admin-a65.workers.dev && bun --env-file=.env test"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240512.0",
+    "@types/jsonwebtoken": "^9.0.6",
     "itty-router": "^3.0.12",
+    "tsup": "^8.0.1",
     "typescript": "^5.0.4",
-    "wrangler": "^3.57.1",
-    "tsup": "^8.0.1"
+    "wrangler": "^3.57.1"
   },
   "dependencies": {
     "@braintrust/proxy": "workspace:*",
     "@opentelemetry/resources": "^1.18.1",
     "@opentelemetry/sdk-metrics": "^1.18.1",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "jsonwebtoken": "^9.0.2"
   }
 }

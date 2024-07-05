@@ -1,15 +1,23 @@
-const PROXY = "https://proxy.admin-a65.workers.dev/v1/chat/completions";
+import { PROXY } from "./utils/constants";
+import { createRandomToken } from "./utils/testAuth";
+import { expect, test } from "bun:test";
+
+const COMMON_HEADERS = {
+  "Content-Type": "application/json",
+  "X-Grit-Api": createRandomToken(),
+};
 
 const OPENAI_HEADERS = {
-  "Content-Type": "application/json",
+  ...COMMON_HEADERS,
   Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
 };
 
 const ANT_HEADERS = {
+  ...COMMON_HEADERS,
   Authorization: `Bearer ${process.env.ANT_API_KEY}`,
 };
 
-async function basic() {
+test("basic__routesBetweenModels", async () => {
   const res = await fetch(PROXY, {
     headers: OPENAI_HEADERS,
     method: "POST",
@@ -25,9 +33,10 @@ async function basic() {
     }),
   });
 
-  const openAiCompletions = await res.json();
+  expect(res.status).toBe(200);
 
-  console.dir(openAiCompletions.choices[0]);
+  const openAiCompletions = await res.json();
+  expect(openAiCompletions.choices.length >= 1).toBe(true);
 
   const antRes = await fetch(PROXY, {
     headers: ANT_HEADERS,
@@ -44,9 +53,8 @@ async function basic() {
     }),
   });
 
+  expect(antRes.status).toBe(200);
+
   const antCompletions = await antRes.json();
-
-  console.dir(antCompletions.choices[0]);
-}
-
-basic();
+  expect(antCompletions.choices.length >= 1).toBe(true);
+});

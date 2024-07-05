@@ -1,6 +1,7 @@
 import { EdgeProxyV1, FlushingExporter } from "@braintrust/proxy/edge";
 import { NOOP_METER_PROVIDER, initMetrics } from "@braintrust/proxy";
 import { PrometheusMetricAggregator } from "./metric-aggregator";
+import { authenticateToken, parseGritToken } from "./auth";
 
 export const proxyV1Prefix = "/v1";
 
@@ -12,6 +13,7 @@ declare global {
     PROMETHEUS_SCRAPE_USER?: string;
     PROMETHEUS_SCRAPE_PASSWORD?: string;
     WHITELISTED_ORIGINS?: string;
+    JWT_SECRET?: string;
   }
 }
 
@@ -63,6 +65,28 @@ export async function handleProxyV1(
   const meter = (meterProvider || NOOP_METER_PROVIDER).getMeter(
     "cloudflare-metrics",
   );
+
+  const gritToken = parseGritToken(request.headers);
+
+  if (!gritToken) {
+    return new Response("Missing X-Grit-Api Header", {
+      status: 400,
+      headers: {
+        "Content-Type": "text/plain",
+      },
+    });
+  }
+
+  const isAuthed = authenticateToken(gritToken, env);
+
+  if (!isAuthed) {
+    return new Response("Invalid X-Grit-Api", {
+      status: 401,
+      headers: {
+        "Content-Type": "text/plain",
+      },
+    });
+  }
 
   const whitelist = originWhitelist(env);
 
