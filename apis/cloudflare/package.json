@@ -8,7 +8,8 @@
     "dev": "wrangler dev --port 8787 --inspector-port 9299",
     "start": "wrangler dev",
     "watch": "tsup --watch --dts",
-    "build": "tsup --clean --dts"
+    "build": "tsup --clean --dts",
+    "test": "node --env-file=.env e2e/basic.ts"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240512.0",
