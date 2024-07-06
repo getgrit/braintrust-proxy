@@ -1,10 +1,10 @@
 import { createRandomToken } from "./utils/testAuth";
 import { expect, test } from "bun:test";
-import { PROXY } from "./utils/constants";
+import { PROXY, TOKEN } from "./utils/constants";
 
 const COMMON_HEADERS = {
   "Content-Type": "application/json",
-  "X-Grit-Api": createRandomToken(),
+  "X-Grit-Api": TOKEN,
 };
 
 const OPENAI_HEADERS_MISSING_GRIT_KEY = {

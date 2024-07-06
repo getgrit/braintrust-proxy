@@ -172,3 +172,5 @@ dist
 
 .dev.vars
 wrangler.toml
+
+certs/

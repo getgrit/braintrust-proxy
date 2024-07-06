@@ -18,7 +18,6 @@ export function createRandomToken(): string {
     issuer: HOST,
     expiresIn: "1h",
     subject: "llm_proxy",
-    algorithm: "HS256",
   });
 
   return token;

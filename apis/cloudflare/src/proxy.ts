@@ -13,6 +13,7 @@ declare global {
     PROMETHEUS_SCRAPE_USER?: string;
     PROMETHEUS_SCRAPE_PASSWORD?: string;
     WHITELISTED_ORIGINS?: string;
+    JWT_PUB_KEY?: string;
     JWT_SECRET?: string;
   }
 }
