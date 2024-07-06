@@ -2,6 +2,7 @@ import { EdgeProxyV1, FlushingExporter } from "@braintrust/proxy/edge";
 import { NOOP_METER_PROVIDER, initMetrics } from "@braintrust/proxy";
 import { PrometheusMetricAggregator } from "./metric-aggregator";
 import { authenticateToken, parseGritToken } from "./auth";
+import { getProviderKey } from "./keyPicker";
 
 export const proxyV1Prefix = "/v1";
 
@@ -15,6 +16,8 @@ declare global {
     WHITELISTED_ORIGINS?: string;
     JWT_PUB_KEY?: string;
     JWT_SECRET?: string;
+    OPENAI_API_KEY?: string;
+    ANT_API_KEY?: string;
   }
 }
 
@@ -89,6 +92,42 @@ export async function handleProxyV1(
     });
   }
 
+  const clonedRequest = request.clone();
+
+  const body = await clonedRequest.json();
+
+  if (
+    typeof body !== "object" ||
+    !body ||
+    !("model" in body) ||
+    typeof body.model !== "string"
+  ) {
+    return new Response("Expected model in body", {
+      status: 400,
+      headers: {
+        "Content-Type": "text/plain",
+      },
+    });
+  }
+
+  const providerKey = getProviderKey(body.model, env);
+
+  if (!providerKey) {
+    return new Response(`Model ${body.model} not found`, {
+      status: 404,
+      headers: {
+        "Content-Type": "text/plain",
+      },
+    });
+  }
+
+  const headers = new Headers(request.headers);
+  headers.set("Authorization", `Bearer ${providerKey}`);
+
+  const reqWithKey = new Request(request, {
+    headers,
+  });
+
   const whitelist = originWhitelist(env);
 
   const cacheGetLatency = meter.createHistogram("results_cache_get_latency");
@@ -145,7 +184,7 @@ export async function handleProxyV1(
     braintrustApiUrl: braintrustAppUrl(env).toString(),
     meterProvider,
     whitelist,
-  })(request, ctx);
+  })(reqWithKey, ctx);
 }
 
 export async function handlePrometheusScrape(
