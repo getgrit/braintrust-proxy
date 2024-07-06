@@ -7,19 +7,9 @@ const COMMON_HEADERS = {
   "X-Grit-Api": TOKEN,
 };
 
-const OPENAI_HEADERS = {
-  ...COMMON_HEADERS,
-  Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-};
-
-const ANT_HEADERS = {
-  ...COMMON_HEADERS,
-  Authorization: `Bearer ${process.env.ANT_API_KEY}`,
-};
-
 test("basic__routesBetweenModels", async () => {
   const res = await fetch(PROXY, {
-    headers: OPENAI_HEADERS,
+    headers: COMMON_HEADERS,
     method: "POST",
     body: JSON.stringify({
       model: "gpt-3.5-turbo",
@@ -39,7 +29,7 @@ test("basic__routesBetweenModels", async () => {
   expect(openAiCompletions.choices.length >= 1).toBe(true);
 
   const antRes = await fetch(PROXY, {
-    headers: ANT_HEADERS,
+    headers: COMMON_HEADERS,
     method: "POST",
     body: JSON.stringify({
       model: "claude-2.1",

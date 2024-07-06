@@ -9,12 +9,6 @@ const COMMON_HEADERS = {
 
 const OPENAI_HEADERS_MISSING_GRIT_KEY = {
   "Content-Type": "application/json",
-  Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-};
-
-const OPENAI_HEADERS_COMPLETE = {
-  ...COMMON_HEADERS,
-  Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
 };
 
 test("auth__failsWhenMissingGritKey", async () => {
@@ -57,7 +51,7 @@ test("auth__failsWhenInvalidGritKey", async () => {
 
 test("auth__succeedsWhenProvidedGritKey", async () => {
   const res = await fetch(PROXY, {
-    headers: OPENAI_HEADERS_COMPLETE,
+    headers: COMMON_HEADERS,
     method: "POST",
     body: JSON.stringify({
       model: "gpt-3.5-turbo",
