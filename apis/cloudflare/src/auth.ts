@@ -1,13 +1,19 @@
 import { verify } from "jsonwebtoken";
+import * as jose from "jose";
 
-export function authenticateToken(token: string, env: Env): boolean {
+export async function authenticateToken(
+  token: string,
+  env: Env,
+): Promise<boolean> {
   if (!env.JWT_PUB_KEY) {
     throw Error("Expected JWT_PUB_KEY in env");
   }
 
+  const pubKey = await jose.importSPKI(env.JWT_PUB_KEY, "RS256");
+
   try {
-    verify(token, env.JWT_PUB_KEY, {
-      algorithms: ["RS256"],
+    await jose.jwtVerify(token, pubKey, {
+      issuer: "grit-llm-router",
     });
   } catch (error) {
     console.error(`Error verifying token ${error}`);

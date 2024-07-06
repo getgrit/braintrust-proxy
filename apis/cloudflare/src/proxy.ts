@@ -78,7 +78,7 @@ export async function handleProxyV1(
     });
   }
 
-  const isAuthed = authenticateToken(gritToken, env);
+  const isAuthed = await authenticateToken(gritToken, env);
 
   if (!isAuthed) {
     return new Response("Invalid X-Grit-Api", {
